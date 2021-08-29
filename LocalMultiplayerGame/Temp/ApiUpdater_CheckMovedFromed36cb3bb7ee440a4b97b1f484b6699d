@@ -1,0 +1,112 @@
+5179986752
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+78
+13
+_jumpGravity
+0
+0
+5179986968
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+78
+34
+JumpHeight
+0
+0
+5179987184
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+78
+58
+TimeToJumpHeight
+0
+0
+5179987400
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+79
+13
+_jumpVelocity
+0
+0
+5179987616
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+79
+39
+_jumpGravity
+0
+0
+5179987832
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+79
+55
+TimeToJumpHeight
+0
+0
+5179988048
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+82
+13
+stepMovement
+0
+0
+5179988264
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+82
+29
+_velocity
+0
+0
+5179988480
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+82
+54
+_gravity
+0
+0
+5179988696
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+83
+33
+stepMovement
+0
+0
+5179988912
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+84
+13
+_velocity
+0
+0
+5179989128
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+84
+28
+_gravity
+0
+0
+5179989344
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+87
+13
+_velocity
+0
+0
+5179989560
+7136607203321344161
+/Users/RileyDNorris/Documents/Personal Projects/Unity/BattleBombs/LocalMultiplayerGame/Assets/Scripts/Player/PlayerMovement.cs
+87
+27
+_jumpVelocity
+0
+0
