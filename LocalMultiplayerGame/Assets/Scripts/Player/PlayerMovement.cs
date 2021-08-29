@@ -24,9 +24,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (_rigidBody == null || _animator == null) return;
-        HandleLanding();
-        HandleMovement();
+        // if (_rigidBody == null || _animator == null) return;
+        // HandleLanding();
+        // HandleMovement();
     }
 
     void HandleLanding()
