@@ -152,6 +152,10 @@ namespace Prime31
         [NonSerialized]
         public Vector3 velocity;
         public bool isGrounded { get { return collisionState.below; } }
+        public bool isCollisionRight { get { return collisionState.right; } }
+        public bool isCollisionLeft { get { return collisionState.left; } }
+        public bool isSideCollision { get { return collisionState.left || collisionState.right; } }
+        public bool wasGroundedLastFrame { get { return collisionState.wasGroundedLastFrame; } }
 
         const float kSkinWidthFloatFudgeFactor = 0.001f;
 
