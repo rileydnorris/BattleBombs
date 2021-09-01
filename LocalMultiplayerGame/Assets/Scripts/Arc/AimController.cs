@@ -4,6 +4,7 @@ using System.Linq;
 
 public class AimController : MonoBehaviour
 {
+    public float forceMultiplier = 50f;
     [SerializeField]
     private PlayerMovement _playerMovement;
     [SerializeField]
@@ -34,13 +35,12 @@ public class AimController : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
         _arcRenderer = GetComponent<ArcRenderer>();
     }
 
     public void UpdateArcPosition(Vector2 aimVector)
     {
-        // Get angle of thumbstick movement
+        // Round angle of thumbstick movement
         var radian = Mathf.Atan2(aimVector.x, aimVector.y) * Mathf.Rad2Deg;
         List<float> vals = new List<float>(new float[] { 0, 45, 90, 135, 180, -45, -90, -135, -180 });
         angle = -1 * vals.OrderBy(x => Mathf.Abs((long)x - radian)).First() + 90;
@@ -56,8 +56,7 @@ public class AimController : MonoBehaviour
     public void Fire()
     {
         Vector2 velocity = GetVelocityForAngle(angle);
-        const float forceMultiplier = 50f;
-        float bombShotOffset = _playerMovement.GetIsFacingRight() ? 0.35f : -0.35f;
+        float bombShotOffset = _playerMovement.isFacingRight ? 0.35f : -0.35f;
 
         GameObject bombShot = Instantiate(_bombShotPrefab, new Vector3(_playerMovement.transform.position.x + bombShotOffset, _playerMovement.transform.position.y + 0.075f, 0), Quaternion.identity);
         bombShot.GetComponent<BombShot>().SetParent(transform.parent.gameObject);

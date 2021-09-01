@@ -4,6 +4,12 @@ using UnityEngine;
 public class ArcRenderer : MonoBehaviour
 {
     public LineRenderer line;
+    private int _obstacleLayerMask;
+
+    void Awake()
+    {
+        _obstacleLayerMask = LayerMask.GetMask("Obstacles");
+    }
 
     public IEnumerator RenderAim(float angle)
     {
@@ -23,7 +29,7 @@ public class ArcRenderer : MonoBehaviour
         Vector3 endPointV3 = transform.position + rotatedVector;
         Vector2 endPointV2 = new Vector2(endPointV3.x, endPointV3.y);
 
-        var hit = Physics2D.Linecast(startPointV2, endPointV2);
+        var hit = Physics2D.Linecast(startPointV2, endPointV2, _obstacleLayerMask);
         if (hit)
         {
             line.transform.eulerAngles = (Vector3.forward);

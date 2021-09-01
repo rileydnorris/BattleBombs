@@ -4,6 +4,17 @@ using Prime31;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Gameplay Variables")]
+    public float gravity = -45f;
+    public float groundDamping = 20f;
+    public float jumpHeight = 3.5f;
+    public float runSpeed = 6.75f;
+    [Header("Jump Assistance")]
+    public float maxHangTime = 0.2f;
+    public float maxSideHangTime = 0.1f;
+    public float maxJumpBuffer = .1f;
+    public float maxSideJumpBuffer = .1f;
+    public float ignoreWallStickDistance;
     private Animator _animator;
     private ParticleSystem _dustTrail;
     private ParticleSystem.EmissionModule _dustTrailEmission;
@@ -11,24 +22,33 @@ public class PlayerMovement : MonoBehaviour
     private ParticleSystem _dustJumping;
     private CharacterController2D _characterController;
     private Vector2 _thumbstickMovement = new Vector2();
-    private Vector3 velocity = new Vector3(0, 0, 0);
-    private float deadzone = 0.3f;
+    private Vector3 _velocity = new Vector3(0, 0, 0);
     private bool _scheduledJump = false;
-    private float hangCounter = 0f;
-    private float sideHangCounter = 0f;
-    private float jumpBufferCounter = 0f;
-    private float sideJumpBufferCounter = 0f;
-    private float jumpDisableDelay = 0f;
-    private float jumpDisableTime = 0.2f;
-    public float gravity = -45f;
-    public float groundDamping = 20f;
-    public float jumpHeight = 3.5f;
-    public float runSpeed = 6.75f;
-    public float maxHangTime = 0.2f;
-    public float maxSideHangTime = 0.1f;
-    public float maxJumpBuffer = .1f;
-    public float maxSideJumpBuffer = .1f;
-    public float ignoreWallStickDistance;
+    private float _hangCounter = 0f;
+    private float _sideHangCounter = 0f;
+    private float _jumpBufferCounter = 0f;
+    private float _sideJumpBufferCounter = 0f;
+    private float _jumpDisableDelay = 0f;
+    private float _jumpDisableTime = 0.2f;
+    private int _obstacleLayerMask;
+
+    // Getters and Setters
+    public bool isFacingRight
+    {
+        get { return _thumbstickMovement.x > 0; }
+    }
+    private bool _canJump
+    {
+        get
+        {
+            // Only jump if the user:
+            // * Is touching the ground or in coyote time
+            // * Has requested to jump within the last 0.X seconds
+            // * Did not just start jumping
+            return (_hangCounter > 0 && _jumpBufferCounter >= 0 && _jumpDisableDelay < 0) || (_sideHangCounter > 0 && _sideJumpBufferCounter >= 0);
+
+        }
+    }
 
     void Awake()
     {
@@ -37,8 +57,8 @@ public class PlayerMovement : MonoBehaviour
         _dustTrail = transform.Find("Dust - Trail").GetComponent<ParticleSystem>();
         _dustLanding = transform.Find("Dust - Landing").GetComponent<ParticleSystem>();
         _dustJumping = transform.Find("Dust - Jumping").GetComponent<ParticleSystem>();
-
         _dustTrailEmission = _dustTrail.emission;
+        _obstacleLayerMask = LayerMask.GetMask("Obstacles");
     }
 
     void Update()
@@ -48,21 +68,14 @@ public class PlayerMovement : MonoBehaviour
         HandleJumpBuffer();
         HandleLanding();
 
-        jumpDisableDelay -= Time.deltaTime;
+        _jumpDisableDelay -= Time.deltaTime;
 
         var jumpVal = GetJumpValue();
         var moveVal = GetMoveValue();
 
-        var test = transform.position;
-        test.y -= ignoreWallStickDistance;
-        Debug.DrawLine(transform.position, test, Color.red);
-        var vec = new Vector2(transform.position.x, transform.position.y);
-        int layer_mask = LayerMask.GetMask("Obstacles");
-        var t = Physics2D.Raycast(transform.position, Vector2.down, ignoreWallStickDistance, layer_mask);
-
-        if (_characterController.isSideCollision && !_characterController.isGrounded && Physics2D.Raycast(transform.position, Vector2.down, ignoreWallStickDistance, layer_mask).collider == null)
+        if (_characterController.isSideCollision && !_characterController.isGrounded && Physics2D.Raycast(transform.position, Vector2.down, ignoreWallStickDistance, _obstacleLayerMask).collider == null)
         {
-            if (jumpVal != velocity.y)
+            if (jumpVal != _velocity.y)
             {
                 // Jump off wall if user jumped
                 var jumpOffForce = _characterController.isCollisionLeft ? 20 : -20;
@@ -80,48 +93,51 @@ public class PlayerMovement : MonoBehaviour
             // Bsic movement
             MovePlayer(moveVal, jumpVal);
         }
-        velocity = _characterController.velocity;
+        _velocity = _characterController.velocity;
     }
 
     void MovePlayer(float moveVal, float jumpVal)
     {
-        velocity.x = moveVal;
-        velocity.y = jumpVal;
-        velocity.y += gravity * Time.deltaTime;
-        _characterController.move(velocity * Time.deltaTime);
+        _velocity.x = moveVal;
+        _velocity.y = jumpVal;
+        _velocity.y += gravity * Time.deltaTime;
+        _characterController.move(_velocity * Time.deltaTime);
     }
 
     void RotatePlayer()
     {
-        transform.rotation = _thumbstickMovement.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+        if (_thumbstickMovement.x != 0)
+        {
+            transform.rotation = _thumbstickMovement.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+        }
     }
 
     void HandleHangTime()
     {
         // Coyote time for down & side directions
         if (_characterController.isGrounded)
-            hangCounter = maxHangTime;
+            _hangCounter = maxHangTime;
         else
-            hangCounter -= Time.deltaTime;
+            _hangCounter -= Time.deltaTime;
 
         if (_characterController.isSideCollision)
-            sideHangCounter = maxSideHangTime;
+            _sideHangCounter = maxSideHangTime;
         else
-            sideHangCounter -= Time.deltaTime;
+            _sideHangCounter -= Time.deltaTime;
     }
 
     void HandleJumpBuffer()
     {
         // Start timer when user wants to jump, and wait to see if user touches ground
         if (_scheduledJump)
-            jumpBufferCounter = maxJumpBuffer;
+            _jumpBufferCounter = maxJumpBuffer;
         else
-            jumpBufferCounter -= Time.deltaTime;
+            _jumpBufferCounter -= Time.deltaTime;
 
         if (_scheduledJump)
-            sideJumpBufferCounter = maxSideJumpBuffer;
+            _sideJumpBufferCounter = maxSideJumpBuffer;
         else
-            sideJumpBufferCounter -= Time.deltaTime;
+            _sideJumpBufferCounter -= Time.deltaTime;
     }
 
     void HandleLanding()
@@ -132,22 +148,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    bool CanJump()
-    {
-        // Only jump if the user:
-        // * Is touching the ground or in coyote time
-        // * Has requested to jump within the last 0.X seconds
-        // * Did not just start jumping
-        return (hangCounter > 0 && jumpBufferCounter >= 0 && jumpDisableDelay < 0) || (sideHangCounter > 0 && sideJumpBufferCounter >= 0);
-    }
-
     float GetJumpValue()
     {
-        if (CanJump())
+        if (_canJump)
         {
-            jumpBufferCounter = 0;
-            sideJumpBufferCounter = 0;
-            jumpDisableDelay = jumpDisableTime;
+            _jumpBufferCounter = 0;
+            _sideJumpBufferCounter = 0;
+            _jumpDisableDelay = _jumpDisableTime;
             _scheduledJump = false;
             _animator.SetBool("IsJumping", true);
             StartParticleSystem(_dustJumping);
@@ -158,25 +165,19 @@ public class PlayerMovement : MonoBehaviour
             _animator.SetBool("IsJumping", false);
 
         _scheduledJump = false;
-        return velocity.y;
+        return _velocity.y;
     }
 
     float GetMoveValue()
     {
-        _dustTrailEmission.rateOverTime = 0;
-        if (Mathf.Abs(_thumbstickMovement.x) > deadzone || Mathf.Abs(_thumbstickMovement.y) > deadzone)
-        {
-            if (_characterController.isGrounded)
-                _dustTrailEmission.rateOverTime = 8f;
-            var moveValue = Mathf.Lerp(velocity.x, _thumbstickMovement.x * runSpeed, Time.deltaTime * groundDamping);
-            _animator.SetFloat("Speed", moveValue);
-            return moveValue;
-        }
+        if (_characterController.isGrounded && _thumbstickMovement.x != 0)
+            _dustTrailEmission.rateOverTime = 8f;
         else
-        {
-            _animator.SetFloat("Speed", 0);
-            return 0;
-        }
+            _dustTrailEmission.rateOverTime = 0;
+
+        var moveValue = Mathf.Lerp(_velocity.x, _thumbstickMovement.x * runSpeed, Time.deltaTime * groundDamping);
+        _animator.SetFloat("Speed", moveValue);
+        return moveValue;
     }
 
     void StartParticleSystem(ParticleSystem ps)
@@ -198,14 +199,10 @@ public class PlayerMovement : MonoBehaviour
 
     public void StopJump()
     {
-        if (velocity.y > 0)
+        // Preemptively reduce jump velocity for gentle deceleration
+        if (_velocity.y > 0)
         {
-            velocity.y *= 0.5f;
+            _velocity.y *= 0.5f;
         }
-    }
-
-    public bool GetIsFacingRight()
-    {
-        return _thumbstickMovement.x > 0;
     }
 }

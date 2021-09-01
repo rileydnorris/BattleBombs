@@ -11,6 +11,7 @@ public class PlayerInputController : MonoBehaviour
     private CharacterController2D _characterController;
     private bool _isAiming = false;
     private Vector2 _thumbstickMovement;
+    private float _deadzone = 0.3f;
 
     void Awake()
     {
@@ -34,8 +35,14 @@ public class PlayerInputController : MonoBehaviour
             _aimController.UpdateArcPosition(_thumbstickMovement);
             _playerMovement.SetThumbstickMovement(Vector2.zero);
         }
-        else
+        else if (Mathf.Abs(_thumbstickMovement.x) > _deadzone || Mathf.Abs(_thumbstickMovement.y) > _deadzone)
+        {
             _playerMovement.SetThumbstickMovement(_thumbstickMovement);
+        }
+        else
+        {
+            _playerMovement.SetThumbstickMovement(Vector2.zero);
+        }
     }
 
     void OnEnable()
