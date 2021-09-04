@@ -16,23 +16,6 @@ public class AimController : MonoBehaviour
     private float angleVel = 5f;
     private float straightVel = 8f;
 
-    Vector2 GetVelocityForAngle(float val)
-    {
-        Dictionary<float, Vector2> velocities = new Dictionary<float, Vector2>()
-        {
-            { 0, new Vector2(straightVel, 0) },
-            { 45, new Vector2(angleVel, angleVel) },
-            { 90, new Vector2(0, straightVel) },
-            { 135, new Vector2(-angleVel, angleVel) },
-            { 180, new Vector2(-straightVel, 0) },
-            { 225, new Vector2(-angleVel, -angleVel) },
-            { 270, new Vector2(0, -straightVel) },
-            { -90, new Vector2(0, -straightVel) },
-            { -45, new Vector2(angleVel, -angleVel) },
-        };
-        return velocities[val];
-    }
-
     void Start()
     {
         _arcRenderer = GetComponent<ArcRenderer>();
@@ -55,12 +38,8 @@ public class AimController : MonoBehaviour
 
     public void Fire()
     {
-        Vector2 velocity = GetVelocityForAngle(angle);
-        float bombShotOffset = _playerMovement.isFacingRight ? 0.35f : -0.35f;
-
-        GameObject bombShot = Instantiate(_bombShotPrefab, new Vector3(_playerMovement.transform.position.x + bombShotOffset, _playerMovement.transform.position.y + 0.075f, 0), Quaternion.identity);
-        bombShot.GetComponent<BombShot>().SetParent(transform.parent.gameObject);
-        bombShot.transform.parent = _shotContainer.transform;
-        bombShot.GetComponent<Rigidbody2D>().AddForce(new Vector2(velocity.x * forceMultiplier, velocity.y * forceMultiplier));
+        float bombShotOffset = _playerMovement.isFacingRight ? -0.5f : 0.5f;
+        GameObject bombShot = Instantiate(_bombShotPrefab, new Vector3(_playerMovement.transform.position.x + bombShotOffset, _playerMovement.transform.position.y + 0.065f, 0), Quaternion.identity);
+        bombShot.GetComponent<BombShot>().SetAngle(angle);
     }
 }
