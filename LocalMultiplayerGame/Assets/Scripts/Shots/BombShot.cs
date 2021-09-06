@@ -11,6 +11,7 @@ public class BombShot : MonoBehaviour
     private CharacterController2D _characterController;
     private ObjectMovement _objectMovement;
     private float _angle = 0;
+    private bool _isExplosionStarted = false;
 
     void Start()
     {
@@ -26,7 +27,7 @@ public class BombShot : MonoBehaviour
 
     void Update()
     {
-        if (_characterController.collisionState.hasCollision())
+        if (!_isExplosionStarted && _characterController.collisionState.hasCollision())
         {
             _objectMovement.StopMotion();
             StartCoroutine(Explode());
@@ -52,8 +53,25 @@ public class BombShot : MonoBehaviour
 
     IEnumerator Explode()
     {
+        _isExplosionStarted = true;
         yield return new WaitForSeconds(2);
+
+        var hitColliders = Physics2D.OverlapCircleAll(transform.position, 5.0f);
+        for (int i = 0; i < hitColliders.Length; i++)
+        {
+            if (hitColliders[i].name == "Player")
+            {
+                Debug.Log("Foud");
+            }
+        }
+
         _animator.SetBool("isImpact", true);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, 5.0f);
     }
 
     public void SetParent(GameObject parent)

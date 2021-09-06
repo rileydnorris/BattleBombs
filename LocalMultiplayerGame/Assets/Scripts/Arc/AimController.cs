@@ -9,12 +9,8 @@ public class AimController : MonoBehaviour
     private PlayerMovement _playerMovement;
     [SerializeField]
     private GameObject _bombShotPrefab;
-    [SerializeField]
-    private GameObject _shotContainer;
     private ArcRenderer _arcRenderer;
     private float angle = 0;
-    private float angleVel = 5f;
-    private float straightVel = 8f;
 
     void Start()
     {

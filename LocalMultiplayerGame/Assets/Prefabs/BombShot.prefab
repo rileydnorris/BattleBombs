@@ -238,8 +238,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c35d8b77360043eeb1612b5981c073a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 0.1
-  gravity: -50
-  secondaryGravity: -50
-  runSpeed: 24
   groundDamping: 20

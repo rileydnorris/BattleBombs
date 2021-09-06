@@ -2,13 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Prime31;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : ObjectMovement
 {
-    [Header("Gameplay Variables")]
-    public float gravity = -45f;
-    public float groundDamping = 20f;
-    public float jumpHeight = 3.5f;
-    public float runSpeed = 6.75f;
     [Header("Jump Assistance")]
     public float maxHangTime = 0.2f;
     public float maxSideHangTime = 0.1f;
@@ -20,10 +15,9 @@ public class PlayerMovement : MonoBehaviour
     private ParticleSystem.EmissionModule _dustTrailEmission;
     private ParticleSystem _dustLanding;
     private ParticleSystem _dustJumping;
-    private CharacterController2D _characterController;
+    // private CharacterController2D _characterController;
     private Vector2 _thumbstickMovement = new Vector2();
-    private Vector3 _velocity = new Vector3(0, 0, 0);
-    private bool _scheduledJump = false;
+    // private Vector3 _velocity = new Vector3(0, 0, 0);
     private float _hangCounter = 0f;
     private float _sideHangCounter = 0f;
     private float _jumpBufferCounter = 0f;
@@ -37,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     {
         get { return _thumbstickMovement.x > 0; }
     }
-    private bool _canJump
+    protected override bool _canJump
     {
         get
         {
@@ -50,58 +44,25 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Awake()
+    protected override void DidStart()
     {
-        _characterController = GetComponent<CharacterController2D>();
+        base.DidStart();
         _animator = GetComponent<Animator>();
         _dustTrail = transform.Find("Dust - Trail").GetComponent<ParticleSystem>();
         _dustLanding = transform.Find("Dust - Landing").GetComponent<ParticleSystem>();
         _dustJumping = transform.Find("Dust - Jumping").GetComponent<ParticleSystem>();
         _dustTrailEmission = _dustTrail.emission;
         _obstacleLayerMask = LayerMask.GetMask("Obstacles");
+        SetParameters(new Vector3(6.75f, 3.5f, -45));
     }
 
-    void Update()
+    protected override void WillUpdate()
     {
-        RotatePlayer();
         HandleHangTime();
         HandleJumpBuffer();
         HandleLanding();
-
         _jumpDisableDelay -= Time.deltaTime;
-
-        var jumpVal = GetJumpValue();
-        var moveVal = GetMoveValue();
-
-        if (_characterController.isSideCollision && !_characterController.isGrounded && Physics2D.Raycast(transform.position, Vector2.down, ignoreWallStickDistance, _obstacleLayerMask).collider == null)
-        {
-            if (jumpVal != _velocity.y)
-            {
-                // Jump off wall if user jumped
-                var jumpOffForce = _characterController.isCollisionLeft ? 20 : -20;
-                MovePlayer(moveVal + jumpOffForce, jumpVal);
-            }
-            else if (_characterController.isCollisionLeft ? moveVal > 0 : moveVal < 0)
-            {
-                // Move off wall if thumbstick in opposite direction of wall
-                MovePlayer(moveVal, jumpVal);
-            }
-            // Do nothing otherwise
-        }
-        else
-        {
-            // Bsic movement
-            MovePlayer(moveVal, jumpVal);
-        }
-        _velocity = _characterController.velocity;
-    }
-
-    void MovePlayer(float moveVal, float jumpVal)
-    {
-        _velocity.x = moveVal;
-        _velocity.y = jumpVal;
-        _velocity.y += gravity * Time.deltaTime;
-        _characterController.move(_velocity * Time.deltaTime);
+        RotatePlayer();
     }
 
     void RotatePlayer()
@@ -109,6 +70,30 @@ public class PlayerMovement : MonoBehaviour
         if (_thumbstickMovement.x != 0)
         {
             transform.rotation = _thumbstickMovement.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+        }
+    }
+
+    protected override void Move(float horizontalVal, float verticalVal)
+    {
+        if (_characterController.isSideCollision && !_characterController.isGrounded && Physics2D.Raycast(transform.position, Vector2.down, ignoreWallStickDistance, _obstacleLayerMask).collider == null)
+        {
+            if (verticalVal != _velocity.y)
+            {
+                // Jump off wall if user jumped
+                var jumpOffForce = _characterController.isCollisionLeft ? 20 : -20;
+                base.Move(horizontalVal + jumpOffForce, verticalVal);
+            }
+            else if (_characterController.isCollisionLeft ? horizontalVal > 0 : horizontalVal < 0)
+            {
+                // Move off wall if thumbstick in opposite direction of wall
+                base.Move(horizontalVal, verticalVal);
+            }
+            // Do nothing otherwise
+        }
+        else
+        {
+            // Bsic movement
+            base.Move(horizontalVal, verticalVal);
         }
     }
 
@@ -129,12 +114,12 @@ public class PlayerMovement : MonoBehaviour
     void HandleJumpBuffer()
     {
         // Start timer when user wants to jump, and wait to see if user touches ground
-        if (_scheduledJump)
+        if (_doJump)
             _jumpBufferCounter = maxJumpBuffer;
         else
             _jumpBufferCounter -= Time.deltaTime;
 
-        if (_scheduledJump)
+        if (_doJump)
             _sideJumpBufferCounter = maxSideJumpBuffer;
         else
             _sideJumpBufferCounter -= Time.deltaTime;
@@ -148,36 +133,40 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    float GetJumpValue()
+    protected override float GetVerticalValue()
     {
+        var y = 0f;
         if (_canJump)
         {
             _jumpBufferCounter = 0;
             _sideJumpBufferCounter = 0;
             _jumpDisableDelay = _jumpDisableTime;
-            _scheduledJump = false;
             _animator.SetBool("IsJumping", true);
             StartParticleSystem(_dustJumping);
-            return Mathf.Sqrt(2f * jumpHeight * -gravity);
+            y = Mathf.Sqrt(2f * _verticalPower * -_gravity);
+        }
+        else
+        {
+            y = _velocity.y;
         }
 
         if (_characterController.isGrounded)
             _animator.SetBool("IsJumping", false);
 
-        _scheduledJump = false;
-        return _velocity.y;
+        _doJump = false;
+        return y;
     }
 
-    float GetMoveValue()
+    protected override float GetHorizontalValue()
     {
         if (_characterController.isGrounded && _thumbstickMovement.x != 0)
             _dustTrailEmission.rateOverTime = 8f;
         else
             _dustTrailEmission.rateOverTime = 0;
 
-        var moveValue = Mathf.Lerp(_velocity.x, _thumbstickMovement.x * runSpeed, Time.deltaTime * groundDamping);
+        var moveValue = Mathf.Lerp(_velocity.x, _moveModifier.x * _horizontalPower, Time.deltaTime * groundDamping);
         _animator.SetFloat("Speed", moveValue);
-        return moveValue;
+        return Mathf.Lerp(_velocity.x, _moveModifier.x * _horizontalPower, Time.deltaTime * groundDamping);
     }
 
     void StartParticleSystem(ParticleSystem ps)
@@ -190,19 +179,11 @@ public class PlayerMovement : MonoBehaviour
     public void SetThumbstickMovement(Vector2 moveValue)
     {
         _thumbstickMovement = moveValue;
+        SetMoveModifier(moveValue);
     }
 
     public void SetJumpValue(bool doJump)
     {
-        _scheduledJump = doJump;
-    }
-
-    public void StopJump()
-    {
-        // Preemptively reduce jump velocity for gentle deceleration
-        if (_velocity.y > 0)
-        {
-            _velocity.y *= 0.5f;
-        }
+        _doJump = doJump;
     }
 }

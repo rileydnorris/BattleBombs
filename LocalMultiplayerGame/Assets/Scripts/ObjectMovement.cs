@@ -5,40 +5,45 @@ using Prime31;
 
 public class ObjectMovement : MonoBehaviour
 {
-    private CharacterController2D _characterController;
-    private Vector3 _velocity = new Vector3();
-    private Vector2 _moveModifier = new Vector2(1, 1);
-    private bool _doJump = false;
-    private bool _stopMotion = false;
-    private float _verticalPower;
-    private float _gravity;
-    private float _horizontalPower;
+    protected CharacterController2D _characterController;
+    protected Vector3 _velocity = new Vector3();
+    protected Vector2 _moveModifier = new Vector2(1, 1);
+    protected bool _doJump = false;
+    protected bool _stopMotion = false;
+    protected float _verticalPower;
+    protected float _gravity;
+    protected float _horizontalPower;
     public float groundDamping;
+
+    // Virtual Functions
+    protected virtual bool _canJump { get { return true; } }
+    protected virtual void DidStart() { }
+    protected virtual void WillUpdate() { }
 
     void Start()
     {
         _characterController = GetComponent<CharacterController2D>();
+        DidStart();
     }
 
     void Update()
     {
+        WillUpdate();
         if (!_stopMotion)
         {
-            var jumpVal = GetVerticalValue();
-            var moveVal = GetHorizontalValue();
-            Move(moveVal, jumpVal);
+            Move(GetHorizontalValue(), GetVerticalValue());
         }
-    }
-
-    void Move(float moveVal, float jumpVal)
-    {
-        _velocity.x = moveVal;
-        _velocity.y = jumpVal + _gravity * Time.deltaTime;
-        _characterController.move(_velocity * Time.deltaTime);
         _velocity = _characterController.velocity;
     }
 
-    float GetVerticalValue()
+    protected virtual void Move(float horizontalVal, float verticalVal)
+    {
+        _velocity.x = horizontalVal;
+        _velocity.y = verticalVal + _gravity * Time.deltaTime;
+        _characterController.move(_velocity * Time.deltaTime);
+    }
+
+    protected virtual float GetVerticalValue()
     {
         var y = 0f;
         if (_doJump)
@@ -50,7 +55,7 @@ public class ObjectMovement : MonoBehaviour
         return y;
     }
 
-    float GetHorizontalValue()
+    protected virtual float GetHorizontalValue()
     {
         return Mathf.Lerp(_velocity.x, _moveModifier.x * _horizontalPower, Time.deltaTime * groundDamping);
     }
