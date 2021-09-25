@@ -15,9 +15,7 @@ public class PlayerMovement : ObjectMovement
     private ParticleSystem.EmissionModule _dustTrailEmission;
     private ParticleSystem _dustLanding;
     private ParticleSystem _dustJumping;
-    // private CharacterController2D _characterController;
     private Vector2 _thumbstickMovement = new Vector2();
-    // private Vector3 _velocity = new Vector3(0, 0, 0);
     private float _hangCounter = 0f;
     private float _sideHangCounter = 0f;
     private float _jumpBufferCounter = 0f;
@@ -29,7 +27,10 @@ public class PlayerMovement : ObjectMovement
     // Getters and Setters
     public bool isFacingRight
     {
-        get { return _thumbstickMovement.x > 0; }
+        get
+        {
+            return transform.rotation != Quaternion.identity;
+        }
     }
     protected override bool _canJump
     {
@@ -135,6 +136,9 @@ public class PlayerMovement : ObjectMovement
 
     protected override float GetVerticalValue()
     {
+        if (_characterController.isGrounded)
+            _animator.SetBool("IsJumping", false);
+
         var y = 0f;
         if (_canJump)
         {
@@ -150,8 +154,6 @@ public class PlayerMovement : ObjectMovement
             y = _velocity.y;
         }
 
-        if (_characterController.isGrounded)
-            _animator.SetBool("IsJumping", false);
 
         _doJump = false;
         return y;

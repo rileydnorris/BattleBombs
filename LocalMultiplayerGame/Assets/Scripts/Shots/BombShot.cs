@@ -61,7 +61,8 @@ public class BombShot : MonoBehaviour
         {
             if (hitColliders[i].name == "Player")
             {
-                Debug.Log("Foud");
+                Debug.Log(hitColliders[i].gameObject.name);
+                hitColliders[i].gameObject.GetComponent<PlayerMovement>().Knockback();
             }
         }
 
