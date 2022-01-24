@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Prime31;
 
-public class ObjectMovement : MonoBehaviour
+public class PhysicsMovement : MonoBehaviour
 {
     protected CharacterController2D _characterController;
     protected Vector3 _velocity = new Vector3();

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Prime31;
 
-public class PlayerMovement : ObjectMovement
+public class PlayerMovement : PhysicsMovement
 {
     [Header("Jump Assistance")]
     public float maxHangTime = 0.2f;
@@ -10,11 +10,8 @@ public class PlayerMovement : ObjectMovement
     public float maxJumpBuffer = .1f;
     public float maxSideJumpBuffer = .1f;
     public float ignoreWallStickDistance;
-    private Animator _animator;
-    private ParticleSystem _dustTrail;
-    private ParticleSystem.EmissionModule _dustTrailEmission;
-    private ParticleSystem _dustLanding;
-    private ParticleSystem _dustJumping;
+    private GameObject _sprite;
+    private PlayerAnimator _animator;
     private Vector2 _thumbstickMovement = new Vector2();
     private float _hangCounter = 0f;
     private float _sideHangCounter = 0f;
@@ -25,11 +22,11 @@ public class PlayerMovement : ObjectMovement
     private int _obstacleLayerMask;
 
     // Getters and Setters
-    public bool isFacingRight
+    public PlayerDirection direction
     {
         get
         {
-            return transform.rotation != Quaternion.identity;
+            return _sprite.transform.rotation != Quaternion.identity ? PlayerDirection.Left : PlayerDirection.Right;
         }
     }
     protected override bool _canJump
@@ -48,11 +45,8 @@ public class PlayerMovement : ObjectMovement
     protected override void DidStart()
     {
         base.DidStart();
-        _animator = GetComponent<Animator>();
-        _dustTrail = transform.Find("Dust - Trail").GetComponent<ParticleSystem>();
-        _dustLanding = transform.Find("Dust - Landing").GetComponent<ParticleSystem>();
-        _dustJumping = transform.Find("Dust - Jumping").GetComponent<ParticleSystem>();
-        _dustTrailEmission = _dustTrail.emission;
+        _animator = GetComponent<PlayerAnimator>();
+        _sprite = transform.Find("Sprite").gameObject;
         _obstacleLayerMask = LayerMask.GetMask("Obstacles");
         SetParameters(new Vector3(6.75f, 3.5f, -45));
     }
@@ -70,7 +64,7 @@ public class PlayerMovement : ObjectMovement
     {
         if (_thumbstickMovement.x != 0)
         {
-            transform.rotation = _thumbstickMovement.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+            _sprite.transform.rotation = _thumbstickMovement.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
         }
     }
 
@@ -93,7 +87,7 @@ public class PlayerMovement : ObjectMovement
         }
         else
         {
-            // Bsic movement
+            // Basic movement
             base.Move(horizontalVal, verticalVal);
         }
     }
@@ -130,23 +124,19 @@ public class PlayerMovement : ObjectMovement
     {
         if (!_characterController.wasGroundedLastFrame && _characterController.isGrounded)
         {
-            StartParticleSystem(_dustLanding);
+            _animator.Land();
         }
     }
 
     protected override float GetVerticalValue()
     {
-        if (_characterController.isGrounded)
-            _animator.SetBool("IsJumping", false);
-
         var y = 0f;
         if (_canJump)
         {
+            _animator.Jump();
             _jumpBufferCounter = 0;
             _sideJumpBufferCounter = 0;
             _jumpDisableDelay = _jumpDisableTime;
-            _animator.SetBool("IsJumping", true);
-            StartParticleSystem(_dustJumping);
             y = Mathf.Sqrt(2f * _verticalPower * -_gravity);
         }
         else
@@ -154,38 +144,20 @@ public class PlayerMovement : ObjectMovement
             y = _velocity.y;
         }
 
-
         _doJump = false;
         return y;
     }
 
     protected override float GetHorizontalValue()
     {
-        if (_characterController.isGrounded && _thumbstickMovement.x != 0)
-            _dustTrailEmission.rateOverTime = 8f;
-        else
-            _dustTrailEmission.rateOverTime = 0;
-
         var moveValue = Mathf.Lerp(_velocity.x, _moveModifier.x * _horizontalPower, Time.deltaTime * groundDamping);
-        _animator.SetFloat("Speed", moveValue);
+        _animator.Walk(moveValue, _characterController.isGrounded);
         return Mathf.Lerp(_velocity.x, _moveModifier.x * _horizontalPower, Time.deltaTime * groundDamping);
-    }
-
-    void StartParticleSystem(ParticleSystem ps)
-    {
-        ps.gameObject.SetActive(true);
-        ps.Stop();
-        ps.Play();
     }
 
     public void SetThumbstickMovement(Vector2 moveValue)
     {
         _thumbstickMovement = moveValue;
         SetMoveModifier(moveValue);
-    }
-
-    public void SetJumpValue(bool doJump)
-    {
-        _doJump = doJump;
     }
 }

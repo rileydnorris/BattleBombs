@@ -9,6 +9,8 @@ LocalMultiplayerGame/[Bb]uild/
 LocalMultiplayerGame/[Bb]uilds/
 LocalMultiplayerGame/[Ll]ogs/
 LocalMultiplayerGame/[Mm]emoryCaptures/
+LocalMultiplayerGame/Assets/Designs/
+LocalMultiplayerGame/Assets/WarpedCaves/
 
 PackageCache
 LocalMultiplayerGame/Temp/

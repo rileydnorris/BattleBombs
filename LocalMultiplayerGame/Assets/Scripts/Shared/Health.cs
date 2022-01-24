@@ -31,7 +31,7 @@ public class Health : MonoBehaviour
     public void Damage(int damageAmount = 1)
     {
         _numberOfLives -= damageAmount;
-        if (_numberOfLives < 0)
+        if (_numberOfLives <= 0)
         {
             _parentObj.OnDeath();
         }

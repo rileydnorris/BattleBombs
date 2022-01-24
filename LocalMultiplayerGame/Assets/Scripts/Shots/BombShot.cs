@@ -9,7 +9,7 @@ public class BombShot : MonoBehaviour
     private Rigidbody2D _rigidBody;
     private Animator _animator;
     private CharacterController2D _characterController;
-    private ObjectMovement _objectMovement;
+    private PhysicsMovement _objectMovement;
     private float _angle = 0;
     private bool _isExplosionStarted = false;
 
@@ -17,7 +17,7 @@ public class BombShot : MonoBehaviour
     {
         _rigidBody = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _objectMovement = GetComponent<ObjectMovement>();
+        _objectMovement = GetComponent<PhysicsMovement>();
         _characterController = GetComponent<CharacterController2D>();
         GetComponent<SpriteRenderer>().sortingLayerName = "Player";
 
@@ -61,7 +61,6 @@ public class BombShot : MonoBehaviour
         {
             if (hitColliders[i].name == "Player")
             {
-                Debug.Log(hitColliders[i].gameObject.name);
                 hitColliders[i].gameObject.GetComponent<PlayerMovement>().Knockback();
             }
         }

@@ -8,11 +8,13 @@ public class PlayerSpawnManager : MonoBehaviour
     [SerializeField]
     private Map _mapReference;
     private PlayerInputManager _playerInputManager;
+    private float respawnTime = 3f;
 
     void Start()
     {
         _playerInputManager = GetComponent<PlayerInputManager>();
         _playerInputManager.JoinPlayer(0);
+        _playerInputManager.JoinPlayer(1);
     }
 
     public Vector3 GetSpawnPosition()
@@ -31,15 +33,16 @@ public class PlayerSpawnManager : MonoBehaviour
         // TODO: Pick spawn away from other players
 
         Destroy(player);
-        StartCoroutine(RespawnPlayer());
+        StartCoroutine(RespawnPlayer(player.GetComponent<PlayerInput>().playerIndex));
     }
 
-    public IEnumerator RespawnPlayer()
+    public IEnumerator RespawnPlayer(int playerIndex)
     {
         Time.timeScale = 0.3f;
-        yield return new WaitForSeconds(2);
+        var adjustedRespawnTime = Time.timeScale * respawnTime;
+        yield return new WaitForSeconds(adjustedRespawnTime);
 
-        _playerInputManager.JoinPlayer(0);
+        _playerInputManager.JoinPlayer(playerIndex);
         Time.timeScale = 1f;
     }
 }

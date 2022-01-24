@@ -38,7 +38,7 @@ public class ArcRenderer : MonoBehaviour
         }
         else
         {
-            line.SetPosition(1, new Vector3(4f, 0, 1));
+            line.SetPosition(1, new Vector3(5f, 0, 1));
             line.transform.eulerAngles = (Vector3.forward * angle);
         }
     }

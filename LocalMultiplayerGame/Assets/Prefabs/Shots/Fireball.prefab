@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5281955226349674557}
   - component: {fileID: 8112713567105866453}
   m_Layer: 0
-  m_Name: StraightShot
+  m_Name: Fireball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3d67c7f67b016455f9cbc897078463f1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3239ba59f23a44589a3841f3cb43b538, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -125,7 +125,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.375, y: 0.375}
+    oldSize: {x: 0.5, y: 0.5}
     newSize: {x: 0.06, y: 0.06}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -225,5 +225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b564e480d5e04670aa9b30ae90eef24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundDamping: 20
-  test: {x: 25, y: 2.5, z: -40}
+  speed: 18
+  diagonalSpeedModifier: 1.6
+  explosionRadius: 1.22
