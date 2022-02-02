@@ -19,6 +19,7 @@ public class FiringController : MonoBehaviour
 
             GameObject fireball = Instantiate(_fireballPrefab, new Vector3(posX, posY, 0), Quaternion.identity);
             fireball.GetComponent<Fireball>().SetAngle(angle);
+            fireball.GetComponent<Fireball>().SetParent(gameObject);
 
             _ammoCounter.FireWithType();
         }

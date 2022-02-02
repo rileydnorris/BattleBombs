@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerSpawnManager : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class PlayerSpawnManager : MonoBehaviour
     void Start()
     {
         _playerInputManager = GetComponent<PlayerInputManager>();
-        _playerInputManager.JoinPlayer(0);
-        _playerInputManager.JoinPlayer(1);
+        var playerOne = _playerInputManager.JoinPlayer(0);
+        var playerTwo = _playerInputManager.JoinPlayer(1);
     }
 
     public Vector3 GetSpawnPosition()
@@ -26,14 +27,10 @@ public class PlayerSpawnManager : MonoBehaviour
 
     public void PlayerDeath(GameObject player)
     {
-        // Start slow motion
-        // Wait two seconds
-        // Spawn player again
-        // TODO: Add slow motion
         // TODO: Pick spawn away from other players
 
-        Destroy(player);
         StartCoroutine(RespawnPlayer(player.GetComponent<PlayerInput>().playerIndex));
+        Destroy(player);
     }
 
     public IEnumerator RespawnPlayer(int playerIndex)

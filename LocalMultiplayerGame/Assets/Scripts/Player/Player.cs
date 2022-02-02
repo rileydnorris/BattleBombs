@@ -98,4 +98,9 @@ public class Player : MonoBehaviour, HealthEnabledObject
         _spawnManager = GameObject.Find("PlayerManager").GetComponent<PlayerSpawnManager>();
         _spawnManager.PlayerDeath(gameObject);
     }
+
+    public int GetPlayerNumber()
+    {
+        return GetComponent<PlayerInput>().playerIndex;
+    }
 }

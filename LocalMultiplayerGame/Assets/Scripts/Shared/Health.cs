@@ -28,11 +28,15 @@ public class Health : MonoBehaviour
         _numberOfLives = lives;
     }
 
-    public void Damage(int damageAmount = 1)
+    public void Damage(GameObject damageSource = null, int damageAmount = 1)
     {
         _numberOfLives -= damageAmount;
         if (_numberOfLives <= 0)
         {
+            if (damageSource != gameObject)
+                GameObject.Find("ScoreManager").GetComponent<ScoreManager>().AddScore(damageSource);
+            else
+                GameObject.Find("ScoreManager").GetComponent<ScoreManager>().RemoveScore(damageSource);
             _parentObj.OnDeath();
         }
     }

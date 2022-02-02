@@ -35,7 +35,7 @@ public class Fireball : StraightMovement
                 if (hitColliders[i].name.Contains("Player") && !hitObjects.Contains(hitColliders[i].gameObject))
                 {
                     hitObjects.Add(hitColliders[i].gameObject);
-                    hitColliders[i].gameObject.GetComponent<Health>().Damage();
+                    hitColliders[i].gameObject.GetComponent<Health>().Damage(_parent);
                 }
             }
         }
