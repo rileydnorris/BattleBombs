@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Prime31;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, HealthEnabledObject

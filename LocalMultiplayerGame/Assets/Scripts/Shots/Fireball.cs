@@ -22,15 +22,11 @@ public class Fireball : StraightMovement
 
         SetParameters(GetVelocityForAngle(_angle));
         StartCoroutine(StartDetonation());
+        _characterController.onTriggerEnterEvent += OnTriggerEnterEvent;
     }
 
     protected override void WillUpdate()
     {
-        if (_characterController.collisionState.hasCollision())
-        {
-            Explode();
-        }
-
         if (_isExplosionStarted)
         {
             var hitColliders = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
@@ -83,6 +79,11 @@ public class Fireball : StraightMovement
     {
         // Gizmos.color = Color.red;
         // Gizmos.DrawSphere(transform.position, explosionRadius);
+    }
+
+    void OnTriggerEnterEvent(Collider2D collider)
+    {
+        Explode();
     }
 
     public void SetParent(GameObject parent)

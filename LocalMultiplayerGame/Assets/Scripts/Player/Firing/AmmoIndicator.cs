@@ -14,6 +14,7 @@ public class AmmoIndicator : MonoBehaviour
 
     IEnumerator Recharge()
     {
+        _isCharging = true;
         yield return new WaitForSeconds(2f);
         _renderer.material.color = Color.HSVToRGB(0, 0, 1);
         _isCharging = false;
@@ -21,7 +22,6 @@ public class AmmoIndicator : MonoBehaviour
 
     public void Fire()
     {
-        _isCharging = true;
         _renderer.material.color = Color.HSVToRGB(0, 0, .5f);
         StartCoroutine(Recharge());
     }
