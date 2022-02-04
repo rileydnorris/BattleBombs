@@ -7,14 +7,14 @@ public class Player : MonoBehaviour, HealthEnabledObject
     private Health _health;
     private PlayerMovement _playerMovement;
     private AimController _aimController;
-    private PlayerControls _controls;
+    private PlayerInput _controls;
     private bool _isAiming = false;
     private Vector2 _thumbstickMovement;
     private float _deadzone = 0.3f;
 
     void Start()
     {
-        _controls = new PlayerControls();
+        _controls = GetComponent<PlayerInput>();
         _health = GetComponent<Health>();
         _playerMovement = GetComponent<PlayerMovement>();
         _aimController = GetComponentInChildren<AimController>();
@@ -75,15 +75,22 @@ public class Player : MonoBehaviour, HealthEnabledObject
         }
     }
 
+    public void SetControlsEnabled(bool isEnabled)
+    {
+        if (_controls != null && isEnabled)
+            _controls.ActivateInput();
+        else if (_controls != null && !isEnabled)
+            _controls.DeactivateInput();
+    }
+
     void OnEnable()
     {
-        if (_controls != null)
-            _controls.Ground.Enable();
+        SetControlsEnabled(true);
     }
 
     void OnDisable()
     {
-        _controls.Ground.Disable();
+        SetControlsEnabled(false);
     }
 
     public void OnSpawn()
